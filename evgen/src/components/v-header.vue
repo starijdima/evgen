@@ -33,7 +33,7 @@
         },
         mounted(){
             this.thisPath()
-            if (window.location.pathname!=='/' && localStorage.role !== 'admin'){
+            if (window.location.pathname!=='/' && localStorage.role !== 'admin' && localStorage.role !== 'user'){
                 alert('В доступе отказано')
                 window.location.pathname = '/'
             }
