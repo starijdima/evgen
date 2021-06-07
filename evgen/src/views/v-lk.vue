@@ -5,13 +5,13 @@
             <form action="" class="lk-container-item__new-form">
                 <h2>Создать заявку</h2>
                 <label for="title-new">Заголовок*</label>
-                <input id="title-new" name="title" type="text">
+                <input required id="title-new" name="title" type="text">
                 <label for="description-new">Подробное описание*</label>
-                <textarea id="description-new" name="description"></textarea>
+                <textarea required id="description-new" name="description"></textarea>
                 <div class="selected-container">
                     <div class="selected-container__item">
                         <label for="category-new">Категория*</label>
-                        <select name="id_category" id="category-new">
+                        <select required name="id_category" id="category-new">
                             <option value="1">Установка ПО</option>
                             <option value="2">Настройка принтеров/сканеров</option>
                             <option value="3">Замена техники</option>
@@ -25,7 +25,7 @@
                     </div>
                     <div class="selected-container__item">
                         <label for="priority-new">Важность*</label>
-                        <select name="priority" id="priority-new">
+                        <select required name="priority" id="priority-new">
                             <option value="Низкая">Низкая</option>
                             <option value="Высокая">Высокая</option>
                             <option value="Срочная">Срочная</option>
@@ -40,15 +40,17 @@
         </div>
         <div class="lk-container-item__max">
             <form action="" class="lk-container-item__max-form">
-                <h2>Инофрмация о заявке</h2>
+                <h2>Информация о заявке</h2>
                 <label for="title">Заголовок*</label>
                 <input disabled id="title" name="title" type="text">
+                <label for="user_mail">Автор заявки*</label>
+                <input disabled id="user_mail" name="user_mail" type="text">
                 <label for="description">Подробное описание*</label>
                 <textarea disabled id="description" name="description"></textarea>
                 <div class="selected-container">
                     <div class="selected-container__item">
-                        <label for="category">Категория*</label>
-                        <select disabled name="category" id="category">
+                        <label for="id_category">Категория*</label>
+                        <select disabled name="id_category" id="id_category">
                             <option value="1">Установка ПО</option>
                             <option value="2">Настройка принтеров/сканеров</option>
                             <option value="3">Замена техники</option>
@@ -68,8 +70,15 @@
                             <option value="Срочная">Срочная</option>
                         </select>
                     </div>
+
                 </div>
+                <label for="back_form">Последнее сообщение от исполнителя</label>
+                <textarea disabled id="back_form" name="back_form"></textarea>
                 <div class="send-btn__container">
+                    <button type="button" @click="getChat" id="msg" v-if="isWork===true && jobStatus==='3'" class="stage-btn">
+                        <img :src="msg" alt="">
+                        написать
+                    </button>
                     <button type="submit" @click="changeState" id="pause" v-if="isWork===true && jobStatus==='3'" class="stage-btn">
                         <img :src="pause" alt="">
                         приостановить
@@ -82,11 +91,21 @@
                         <img :src="done" alt="">
                         завершить
                     </button>
-                    <button v-if="role==='user' || role==='user'" @click.prevent="">Сохранить</button>
+                    <button v-if="role==='user' || role==='user'" @click="saveChanges">Сохранить</button>
                     <button @click="setAdmin" type="submit" v-if="role==='admin' && jobStatus==='1'">Взяться</button>
                     <button @click.prevent="lockLook">Назад</button>
                 </div>
             </form>
+            <div class="chat">
+                <form action="" class="chat-form">
+                    <label for="back_from">Обратная связь</label>
+                    <textarea name="back_form" id="back_from" cols="30" rows="10"></textarea>
+                    <button type="submit" @click="sendBack">Отправить</button>
+                    <button @click.prevent="lockForm" class="chat-form__lock">
+                        <img :src="lockChat" alt="">
+                    </button>
+                </form>
+            </div>
         </div>
         <div class="lk-container">
             <div class="lk-container-top">
@@ -197,6 +216,8 @@
     import pause from '../assets/pause.svg'
     import play from '../assets/play.svg'
     import done from '../assets/done.svg'
+    import msg from '../assets/msg.svg'
+    import lockChat from '../assets/lock_chat.svg'
 
     export default {
         name: 'v-lk',
@@ -211,15 +232,17 @@
                 jobStatus: '',
                 isWork: '',
                 maxId: '',
-                plus, mark, repair, load, que, vos, pause, play, done
+                users: [],
+                plus, mark, repair, load, que, vos, pause, play, done, msg, lockChat
             }
         },
         created() {
             this.$http.get('http://evgen-api.loc/api/get:all/from:issues').then(function(data){
                 this.issue = JSON.parse(JSON.stringify(data.body));
                 this.userId = localStorage.userid
-                console.log(localStorage.userid)
-                console.log(data.body);
+            });
+            this.$http.get('http://evgen-api.loc/api/get:all/from:users').then(function(data){
+                this.users = JSON.parse(JSON.stringify(data.body));
             })
         },
         methods:{
@@ -260,17 +283,20 @@
                 let issue = this.issue
                 let title = document.querySelector('#title')
                 let description = document.querySelector('#description')
-                let category = document.querySelector('#category')
+                let category = document.querySelector('#id_category')
                 let options = category.querySelectorAll('option')
                 let priority = document.querySelector('#priority')
                 let prOptions = priority.querySelectorAll('option')
+                let author = document.querySelector('#user_mail')
+                let message = document.querySelector('#back_form')
 
                 this.maxId = jobItem.id
                 for (let i=0; i<issue.length; i++) {
                     if (issue[i].id === jobItem.id) {
                         title.value = issue[i].title
                         description.innerText = issue[i].description
-
+                        author.value = issue[i].user_mail
+                        message.innerText = issue[i].back_form
 
                         if (issue[i].id_category === '1') {
                             options[0].setAttribute('selected', 'selected')
@@ -330,8 +356,9 @@
                             description.removeAttribute('disabled')
                             category.removeAttribute('disabled')
                             priority.removeAttribute('disabled')
+                            author.removeAttribute('disabled')
+                            message.removeAttribute('disabled')
                         }
-                        console.log(issue[i].priority)
                         if (issue[i].priority === 'Низкая') {
                             prOptions[0].setAttribute('selected', 'selected')
                         }
@@ -367,6 +394,12 @@
                     formData.append('id', '')
                     formData.append('id_status', '1')
                     formData.append('id_user', localStorage.userid)
+                    let users = this.users
+                    for (let i=0; i<users.length; i++){
+                        if(users[i].id === this.userId){
+                            formData.append('user_mail', users[i].email)
+                        }
+                    }
                     let response = await fetch('http://evgen-api.loc/api/new_issue', {
                         method: 'POST',
                         body: formData
@@ -420,6 +453,45 @@
                     alert('Данные обновлены')
                     window.location.pathname = '/lk'
                 };
+            },
+            getChat(){
+                let chat = document.querySelector('.chat')
+                chat.style.display = 'flex'
+            },
+            lockForm(){
+                let chat = document.querySelector('.chat')
+                chat.style.display = 'none'
+            },
+            sendBack(){
+                let form = document.querySelector('.chat-form')
+                form.onsubmit = async (e) => {
+
+                    e.preventDefault();
+                    let formData = new FormData(form)
+                    formData.append('id', this.maxId)
+                    let response = await fetch('http://evgen-api.loc/api/send_mail', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    alert('Сообщение отправлено')
+                    window.location.pathname = '/lk'
+                };
+            },
+            saveChanges(){
+                let form = document.querySelector('.lk-container-item__max-form')
+                form.onsubmit = async (e) => {
+
+                    e.preventDefault();
+                    let formData = new FormData(form)
+                    formData.append('id', this.maxId)
+                    formData.delete('back_form')
+                    let response = await fetch('http://evgen-api.loc/api/save_changes', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    alert('Данные успешно изменены')
+                    window.location.pathname = '/lk'
+                }
             }
         },
         mounted(){

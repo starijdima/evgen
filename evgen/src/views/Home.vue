@@ -39,18 +39,20 @@ export default {
       let inputs = e.target.parentNode.querySelectorAll('input')
       let usersArray = this.users
       let errorBlock = e.target.parentNode.querySelector('.error-block')
+      errorBlock.innerHTML = ''
       for (let i=0; i<usersArray.length; i++){
+        errorBlock.innerHTML = ''
         if (usersArray[i].email===inputs[0].value && usersArray[i].pass===inputs[1].value){
+          errorBlock.innerHTML = ''
           localStorage.setItem('userid', usersArray[i].id)
           localStorage.setItem('role', usersArray[i].role)
-          errorBlock.innerHTML = ''
           window.location.pathname = '/lk'
         }
-        else{
-
-          errorBlock.innerHTML = ''
-          errorBlock.insertAdjacentHTML('beforeend', '<p>Неверный логин или пароль</p>')
-        }
+        // else{
+        //   errorBlock.innerHTML = ''
+        //   errorBlock.insertAdjacentHTML('beforeend', '<p>Неверный логин или пароль</p>')
+        //
+        // }
       }
     }
   }
