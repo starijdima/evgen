@@ -1,5 +1,5 @@
 <template>
-    <div v-if="this.role === 'admin' || this.role === 'user'" class="lk">
+    <div v-if="role === 'admin' || role === 'user'" class="lk">
         <h2>Личный кабинет</h2>
         <div class="lk-container-item__new">
             <form action="" class="lk-container-item__new-form">
@@ -40,11 +40,17 @@
         </div>
         <div class="lk-container-item__max">
             <form action="" class="lk-container-item__max-form">
-                <h2>Информация о заявке</h2>
+
+                <div class="lk-container-item__max-form-top">
+                    <h2>Информация о заявке</h2>
+                    <p class="lk-container-item__max-form-top__date"></p>
+                </div>
                 <label for="title">Заголовок*</label>
                 <input disabled id="title" name="title" type="text">
-                <label for="user_mail">Автор заявки*</label>
+                <label for="user_mail">Почта заявителя</label>
                 <input disabled id="user_mail" name="user_mail" type="text">
+                <label for="admin_mail">Почта исполнителя</label>
+                <input disabled id="admin_mail" name="admin_mail" type="text">
                 <label for="description">Подробное описание*</label>
                 <textarea disabled id="description" name="description"></textarea>
                 <div class="selected-container">
@@ -91,7 +97,8 @@
                         <img :src="done" alt="">
                         завершить
                     </button>
-                    <button v-if="role==='user' || role==='user'" @click="saveChanges">Сохранить</button>
+                    <button v-if="role==='user' || role==='admin' && authorId === userId" @click="deleteIssue">Удалить</button>
+                    <button v-if="role==='user' || role==='admin' && authorId === userId" @click="saveChanges">Сохранить</button>
                     <button @click="setAdmin" type="submit" v-if="role==='admin' && jobStatus==='1'">Взяться</button>
                     <button @click.prevent="lockLook">Назад</button>
                 </div>
@@ -136,6 +143,10 @@
                                     <p v-if="job.id_status === '5'">Статус: решена</p>
                                     <p v-if="job.id_status === '6'">Статус: повторное возникновение</p>
                                     <p v-if="job.id_status === '7'">Статус: закрыта</p>
+                                    <p v-for="user in users" v-if="user.id === job.id_user">Заявитель: {{user.name}} {{user.last_name}}</p>
+                                </div>
+                                <div class="lk-container-item-left__info-bottom">
+                                    <p v-for="group in groups" v-if="group.id_group === job.id_group">Организация: {{group.name_group}}</p>
                                 </div>
                             </div>
                         </div>
@@ -163,6 +174,10 @@
                                     <p v-if="job.id_status === '5'">Статус: решена</p>
                                     <p v-if="job.id_status === '6'">Статус: повторное возникновение</p>
                                     <p v-if="job.id_status === '7'">Статус: закрыта</p>
+                                    <p v-for="user in users" v-if="user.id === job.is_admin">Исполнитель: {{user.name}} {{user.last_name}}</p>
+                                </div>
+                                <div class="lk-container-item-left__info-bottom">
+                                    <p v-for="group in groups" v-if="group.id_group === job.id_group">Организация: {{group.name_group}}</p>
                                 </div>
                             </div>
                         </div>
@@ -175,7 +190,7 @@
             <div class="lk-container__done">
                 <p class="lk-container__type">Завершенные заявки</p>
                 <div class="lk-container__done-scroll">
-                    <div :id="job.id" v-if="job.id_status==='5' || job.id_status==='7' && job.id_user===userId" v-for="job in issue" class="lk-container-item">
+                    <div :id="job.id" v-if="job.id_status==='5' && job.id_user===userId || job.id_status==='7' && job.id_user===userId || job.id_status==='5' && role==='admin' && job.is_admin===userId" v-for="job in issue" class="lk-container-item">
                         <div class="lk-container-item-left">
                             <div class="lk-container-item-left__status">
                                 <img v-if="job.id_status === '5'" :src="mark" alt="">
@@ -184,7 +199,7 @@
                             <div class="lk-container-item-left__info">
                                 <p>{{job.title}}</p>
                                 <div class="lk-container-item-left__info-bottom">
-                                    <p>Создана: {{job.create_date}}</p>
+                                    <p>Завершена: {{job.resolve_date}}</p>
                                     <p v-if="job.id_status === '1'">Статус: новая</p>
                                     <p v-if="job.id_status === '2'">Статус: не подтверждена</p>
                                     <p v-if="job.id_status === '3'">Статус: в работе</p>
@@ -192,6 +207,10 @@
                                     <p v-if="job.id_status === '5'">Статус: решена</p>
                                     <p v-if="job.id_status === '6'">Статус: повторное возникновение</p>
                                     <p v-if="job.id_status === '7'">Статус: закрыта</p>
+                                    <p v-for="user in users" v-if="user.id === job.id_user">Заявитель: {{user.name}} {{user.last_name}}</p>
+                                </div>
+                                <div class="lk-container-item-left__info-bottom">
+                                    <p v-for="group in groups" v-if="group.id_group === job.id_group">Организация: {{group.name_group}}</p>
                                 </div>
                             </div>
                         </div>
@@ -233,6 +252,8 @@
                 isWork: '',
                 maxId: '',
                 users: [],
+                groups: [],
+                authorId: '',
                 plus, mark, repair, load, que, vos, pause, play, done, msg, lockChat
             }
         },
@@ -243,6 +264,10 @@
             });
             this.$http.get('http://evgen-api.loc/api/get:all/from:users').then(function(data){
                 this.users = JSON.parse(JSON.stringify(data.body));
+            })
+            this.$http.get('http://evgen-api.loc/api/get:all/from:tech_group').then(function(data){
+                this.groups = JSON.parse(JSON.stringify(data.body));
+                console.log(this.groups)
             })
         },
         methods:{
@@ -289,6 +314,7 @@
                 let prOptions = priority.querySelectorAll('option')
                 let author = document.querySelector('#user_mail')
                 let message = document.querySelector('#back_form')
+                let adminMail = document.querySelector('#admin_mail')
 
                 this.maxId = jobItem.id
                 for (let i=0; i<issue.length; i++) {
@@ -297,6 +323,7 @@
                         description.innerText = issue[i].description
                         author.value = issue[i].user_mail
                         message.innerText = issue[i].back_form
+                        adminMail.value = issue[i].admin_mail
 
                         if (issue[i].id_category === '1') {
                             options[0].setAttribute('selected', 'selected')
@@ -351,6 +378,7 @@
                         if (issue[i].is_admin === localStorage.userid && issue[i].id_status === '3') {
                             this.isWork = true
                         }
+                        this.authorId = issue[i].id_user
                         if (this.role === 'user' || this.role === 'admin' && issue[i].id_user === this.userId) {
                             title.removeAttribute('disabled')
                             description.removeAttribute('disabled')
@@ -394,6 +422,7 @@
                     formData.append('id', '')
                     formData.append('id_status', '1')
                     formData.append('id_user', localStorage.userid)
+                    formData.append('id_group', localStorage.id_group)
                     let users = this.users
                     for (let i=0; i<users.length; i++){
                         if(users[i].id === this.userId){
@@ -418,6 +447,7 @@
                     formData.append('id', this.maxId)
                     formData.append('id_status', '3')
                     formData.append('is_admin', localStorage.userid)
+                    formData.append('admin_mail', localStorage.admin_mail)
                     let response = await fetch('http://evgen-api.loc/api/change_req', {
                         method: 'POST',
                         body: formData
@@ -490,6 +520,21 @@
                         body: formData
                     });
                     alert('Данные успешно изменены')
+                    window.location.pathname = '/lk'
+                }
+            },
+            deleteIssue(){
+                let form = document.querySelector('.lk-container-item__max-form')
+                form.onsubmit = async (e) => {
+
+                    e.preventDefault();
+                    let formData = new FormData(form)
+                    formData.append('id', this.maxId)
+                    let response = await fetch('http://evgen-api.loc/api/delete_req', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    alert('Заявка удалена')
                     window.location.pathname = '/lk'
                 }
             }

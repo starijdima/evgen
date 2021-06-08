@@ -34,6 +34,38 @@ html{
     display: flex;
     align-items: center;
     justify-content: space-between;
+    &-nav{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 50%;
+      justify-content: space-between;
+      a{
+        color: #494949;
+        font-weight: bold;
+        transition: 0.3s;
+        opacity: 0.7;
+        &:hover{
+          transition: 0.3s;
+          color: #03A9F4;
+          opacity: 1;
+          transform: scale(1.1);
+        }
+      }
+    }
+    .user-item{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      p{
+        margin-right: 3rem;
+        color: #A2A2A2;
+        span{
+          color: #141414;
+          font-weight: bold;
+        }
+      }
+    }
     h1{
       color: #494949;
       font-size: calc-px(21px);
@@ -238,6 +270,14 @@ html{
       min-width: calc-px(557px);
       display: flex;
       flex-direction: column;
+      &-top{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+
+      }
       .selected-container{
         display: flex;
         flex-direction: row;
@@ -275,7 +315,7 @@ html{
       }
       textarea{
         resize: none;
-        height: 10rem;
+        height: 5rem;
         border: 0;
         border-bottom: 2px dashed #A8A8A8;
         margin-left: 2rem;
@@ -291,6 +331,9 @@ html{
         margin-top: 0rem;
       }
       label[for='user_mail']{
+        margin-top: 2rem;
+      }
+      label[for='admin_mail']{
         margin-top: 2rem;
       }
       label[for='back_form']{
@@ -357,9 +400,7 @@ html{
         font-weight: normal;
         font-size: calc-px(11px);
         color: #B8B8B8;
-        &:last-child{
-          margin-left: 1rem;
-        }
+        margin-right: 0.5rem;
       }
     }
   }
@@ -388,9 +429,7 @@ html{
 }
 
 .lk-container-item__max-form{
-  h2{
-    margin-bottom: 2rem;
-  }
+
   label[for="description-new"]{
     margin-top: 2rem;
   }
@@ -481,6 +520,127 @@ html{
     }
   }
 }
+.issues{
+  .content{
+    width: 75% !important;
+  }
+}
+
+.users{
+  h2{
+    text-align: center;
+    font-style: normal;
+    font-weight: bold;
+    font-size: calc-px(32px);
+    color: #666666;
+    margin: 3rem 0;
+  }
+  table{
+    border: 1px solid #c3c3c3;
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0 auto;
+    td{
+      padding: 0.3rem;
+      text-align: center;
+      border: 1px solid #c3c3c3;
+    }
+    thead{
+      td{
+        font-weight: bold;
+      }
+    }
+
+  }
+  .content{
+    width: 60%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    input{
+      border: 0;
+      outline: none;
+      border-bottom: 2px dashed #A8A8A8;
+      margin-bottom: 1rem;
+      width: 30%;
+      padding: 0.3rem;
+      font-family: Arial;
+      font-size: 1.1rem;
+    }
+  }
+}
+
+.base{
+  h2{
+    text-align: center;
+    font-style: normal;
+    font-weight: bold;
+    font-size: calc-px(32px);
+    color: #666666;
+    margin: 3rem 0;
+  }
+  &-container{
+    display: flex;
+    flex-direction: row;
+    width: 60%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    a{
+      width: 7rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-right: 4rem;
+      transition: 0.3s;
+      &:hover{
+        transform: scale(1.2);
+        transition: 0.3s;
+      }
+      img{
+        width: 80%;
+      }
+      p{
+        margin-top: 1rem;
+        color: #494949;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+.stat{
+  h2{
+    text-align: center;
+    font-style: normal;
+    font-weight: bold;
+    font-size: calc-px(32px);
+    color: #666666;
+    margin: 3rem 0;
+  }
+  table{
+    border: 1px solid #c3c3c3;
+    border-collapse: collapse;
+    width: 70%;
+    margin: 0 auto;
+    td{
+      padding: 0.3rem;
+      text-align: center;
+      border: 1px solid #c3c3c3;
+    }
+    thead{
+      td{
+        font-weight: bold;
+      }
+    }
+
+  }
+}
+
+
+
+
 
 
 

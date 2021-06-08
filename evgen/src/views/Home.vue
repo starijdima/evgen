@@ -29,7 +29,7 @@ export default {
     }
   },
   created() {
-    this.$http.get('http://evgen-api.loc//api/get:all/from:users').then(function(data){
+    this.$http.get('http://evgen-api.loc/api/get:all/from:users').then(function(data){
       this.users = JSON.parse(JSON.stringify(data.body));
       console.log(data.body);
     })
@@ -46,6 +46,8 @@ export default {
           errorBlock.innerHTML = ''
           localStorage.setItem('userid', usersArray[i].id)
           localStorage.setItem('role', usersArray[i].role)
+          localStorage.setItem('id_group', usersArray[i].id_group)
+          localStorage.setItem('admin_mail', usersArray[i].email)
           window.location.pathname = '/lk'
         }
         // else{
