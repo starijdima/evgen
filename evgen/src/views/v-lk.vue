@@ -448,6 +448,7 @@
                     formData.append('id_status', '3')
                     formData.append('is_admin', localStorage.userid)
                     formData.append('admin_mail', localStorage.admin_mail)
+
                     let response = await fetch('http://evgen-api.loc/api/change_req', {
                         method: 'POST',
                         body: formData
@@ -472,7 +473,20 @@
                         formData.append('id_status', '3')
                     }
                     if (btn.id === 'done'){
+                        let Data = new Date();
+                        let Year = Data.getFullYear();
+                        let Month = Data.getMonth();
+                        let Day = Data.getDate();
+                        Month+=''
+                        Day+=''
+                        if (Month.length===1){
+                            Month = '0'+Month
+                        }
+                        if (Day.length===1){
+                            Day = '0'+Day
+                        }
                         formData.append('id_status', '5')
+                        formData.append('resolve_date', Year+'-'+Month+'-'+Day)
                     }
 
                     formData.append('is_admin', localStorage.userid)
