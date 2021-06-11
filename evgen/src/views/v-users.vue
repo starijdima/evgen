@@ -1,7 +1,7 @@
 <template>
     <div class="users">
         <div class="content">
-            <h2>Пользователи</h2>
+            <h2>Клиенты</h2>
             <input
                     placeholder="Поиск"
                     class="search"
@@ -12,17 +12,16 @@
                 <thead>
                 <tr>
                     <td>ID</td>
-                    <td>Предприятие</td>
+                    <td>Организация</td>
                     <td>Имя</td>
                     <td>Фамилия</td>
                     <td>Телефон</td>
                     <td>Почта</td>
                     <td>Роль</td>
-
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="user in filteredUsers">
+                <tr v-if="user.role !== 'admin'" v-for="user in filteredUsers">
                     <td>{{user.id}}</td>
                     <td v-for="group in groups" v-if="user.id_group === group.id_group">{{group.name_group}}</td>
                     <td>{{user.name}}</td>

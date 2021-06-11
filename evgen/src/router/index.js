@@ -6,6 +6,7 @@ import Users from '../views/v-users'
 import Issues from '../views/v-issues'
 import Base from '../views/v-base'
 import Stat from '../views/v-stat'
+import Otchet from '../views/v-otchet'
 
 Vue.use(VueRouter)
 
@@ -39,6 +40,11 @@ const routes = [
     path: '/stat',
     name: 'Stat',
     component: Stat
+  },
+  {
+    path: '/otchet',
+    name: 'otchet',
+    component: Otchet
   },
 
 ]

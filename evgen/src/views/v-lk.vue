@@ -98,7 +98,7 @@
                         завершить
                     </button>
                     <button v-if="role==='user' || role==='admin' && authorId === userId" @click="deleteIssue">Удалить</button>
-                    <button v-if="role==='user' || role==='admin' && authorId === userId" @click="saveChanges">Сохранить</button>
+                    <button v-if="role==='user'" @click="saveChanges">Сохранить</button>
                     <button @click="setAdmin" type="submit" v-if="role==='admin' && jobStatus==='1'">Взяться</button>
                     <button @click.prevent="lockLook">Назад</button>
                 </div>
@@ -124,7 +124,7 @@
             <div class="lk-container__active">
                 <p class="lk-container__type">Активные заявки</p>
                 <div class="lk-container__active-scroll">
-                    <div :id="job.id" v-if="role==='admin' && userId===job.id_user && job.id_status!=='5' || role==='admin' && userId===job.is_admin && job.id_status!=='5' || role==='admin' && job.is_admin===null && job.id_status!=='5' || role==='admin' && job.id_status==='4' && job.id_status!=='5'" v-for="job in issue" class="lk-container-item">
+                    <div :id="job.id" :name="job.id_status" v-if="role==='admin' && userId===job.id_user && job.id_status!=='5' || role==='admin' && userId===job.is_admin && job.id_status!=='5' || role==='admin' && job.is_admin===null && job.id_status!=='5' || role==='admin' && job.id_status==='4' && job.id_status!=='5'" v-for="job in issue" class="lk-container-item">
                         <div class="lk-container-item-left">
                             <div class="lk-container-item-left__status">
                                 <img v-if="job.id_status === '3'" :src="repair" alt="">
@@ -175,9 +175,6 @@
                                     <p v-if="job.id_status === '6'">Статус: повторное возникновение</p>
                                     <p v-if="job.id_status === '7'">Статус: закрыта</p>
                                     <p v-for="user in users" v-if="user.id === job.is_admin">Исполнитель: {{user.name}} {{user.last_name}}</p>
-                                </div>
-                                <div class="lk-container-item-left__info-bottom">
-                                    <p v-for="group in groups" v-if="group.id_group === job.id_group">Организация: {{group.name_group}}</p>
                                 </div>
                             </div>
                         </div>
@@ -297,11 +294,16 @@
             },
             openLook(e){
                 let jobItem = ''
+
                 if (e.target.className === 'lk-container-item-right'){
                     jobItem = e.target.parentNode
+                    console.log(e.target.parentNode)
+                    localStorage.setItem('id_issue', e.target.parentNode.id)
                 }
                 else{
                     jobItem = e.target.parentNode.parentNode
+                    console.log(e.parentNode)
+                    localStorage.setItem('id_issue', e.target.id)
                 }
                 let form = document.querySelector('.lk-container-item__max')
                 form.className = 'lk-container-item__max menu-to'
@@ -379,7 +381,7 @@
                             this.isWork = true
                         }
                         this.authorId = issue[i].id_user
-                        if (this.role === 'user' || this.role === 'admin' && issue[i].id_user === this.userId) {
+                        if (this.role === 'user') {
                             title.removeAttribute('disabled')
                             description.removeAttribute('disabled')
                             category.removeAttribute('disabled')
@@ -405,6 +407,9 @@
                 let Year = Data.getFullYear();
                 let Month = Data.getMonth();
                 let Day = Data.getDate();
+                let Hours = Data.getHours();
+                let Minutes = Data.getMinutes();
+                let Seconds = Data.getSeconds();
                 Month+=''
                 Day+=''
                 if (Month.length===1){
@@ -417,7 +422,7 @@
 
                     e.preventDefault();
                     let formData = new FormData(form)
-                    formData.append('create_date', Year+'-'+Month+'-'+Day)
+                    formData.append('create_date', Year+'-'+Month+'-'+Day+' '+Hours+':'+Minutes+':'+Seconds)
                     formData.append('id_issue', '')
                     formData.append('id', '')
                     formData.append('id_status', '1')
@@ -439,6 +444,7 @@
             },
             setAdmin(){
                 let form = document.querySelector('.lk-container-item__max-form')
+
                 form.onsubmit = async (e) => {
 
                     e.preventDefault();
@@ -460,6 +466,8 @@
             changeState(e){
                 let btn = e.target
                 let form = document.querySelector('.lk-container-item__max-form')
+                console.log(btn)
+                let issues = this.issue
                 form.onsubmit = async (e) => {
 
                     e.preventDefault();
@@ -477,18 +485,98 @@
                         let Year = Data.getFullYear();
                         let Month = Data.getMonth();
                         let Day = Data.getDate();
+                        let Hours = Data.getHours();
+                        let Minutes = Data.getMinutes();
+                        let Seconds = Data.getSeconds();
+                        let DateDone
+                        let MonthDone, DayDone, HourDone, MinutesDone, SecondDate
+
+                        for (let k=0; k<issues.length; k++){
+                            if (localStorage.id_issue === issues[k].id){
+                                DateDone = issues[k].create_date
+
+                                MonthDone = DateDone.slice(5, 7)
+                                DayDone = DateDone.slice(8, 10)
+                                HourDone = DateDone.slice(11, 13)
+                                MinutesDone = DateDone.slice(14, 16)
+                                SecondDate = DateDone.slice(17, 19)
+                                if (MonthDone.length===1){
+                                    MonthDone = '0'+MonthDone
+                                }
+                                if (Day.length===1){
+                                    DayDone = '0'+DayDone
+                                }
+                                if (HourDone.length===1){
+                                    HourDone = '0'+HourDone
+                                }
+                                if (MinutesDone.length===1){
+                                    MinutesDone = '0'+MinutesDone
+                                }
+                                if (SecondDate.length===1){
+                                    SecondDate = '0'+SecondDate
+                                }
+                            }
+                        }
+                        let timeDiff, dayDiff, hourDiff, minutesDiff
+
+                        dayDiff = parseInt(DayDone, 10) - Day
+                        console.log(parseInt(DayDone, 10) - Day)
+                        hourDiff = parseInt(HourDone, 10) - Hours
+                        console.log(parseInt(HourDone, 10) - Hours)
+                        minutesDiff = parseInt(MinutesDone, 10) - Minutes
+                        console.log(parseInt(MinutesDone, 10) - Minutes)
+
+
+                        if(dayDiff < 0){
+                            dayDiff = -dayDiff
+                            console.log(dayDiff)
+                        }
+                        if (dayDiff===0){
+                            dayDiff = 0
+                            console.log(dayDiff)
+                        }
+                        if (hourDiff < 0){
+                            hourDiff = -hourDiff
+                            console.log(hourDiff)
+                        }
+                        if (minutesDiff < 0){
+                            minutesDiff = -minutesDiff
+                            console.log(minutesDiff)
+                        }
+
+
+                        if (dayDiff === 0){
+                            timeDiff = 'Часов: ' + hourDiff + ' Минут: ' + minutesDiff
+                        }
+                        if (dayDiff>1){
+                            timeDiff = 'Дней: ' + dayDiff + 'Часов: ' + hourDiff + ' Минут: ' + minutesDiff
+                        }
+
                         Month+=''
                         Day+=''
+
+                        //let timeDiff =
+
                         if (Month.length===1){
                             Month = '0'+Month
                         }
                         if (Day.length===1){
                             Day = '0'+Day
                         }
+                        if (Hours.length===1){
+                            Hours = '0'+Hours
+                        }
+                        if (Minutes.length===1){
+                            Minutes = '0'+Minutes
+                        }
+                        if (Seconds.length===1){
+                            Seconds = '0'+Seconds
+                        }
                         formData.append('id_status', '5')
-                        formData.append('resolve_date', Year+'-'+Month+'-'+Day)
-                    }
+                        formData.append('resolve_date', Year+'-'+Month+'-'+Day+' '+Hours+':'+Minutes+':'+Seconds)
+                        formData.append('time_diff', timeDiff)
 
+                    }
                     formData.append('is_admin', localStorage.userid)
                     let response = await fetch('http://evgen-api.loc/api/change_req', {
                         method: 'POST',

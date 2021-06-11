@@ -619,11 +619,17 @@ html{
     color: #666666;
     margin: 3rem 0;
   }
+  h3{
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #A2A2A2;
+  }
   table{
     border: 1px solid #c3c3c3;
     border-collapse: collapse;
     width: 70%;
     margin: 0 auto;
+    margin-bottom: 2rem;
     td{
       padding: 0.3rem;
       text-align: center;

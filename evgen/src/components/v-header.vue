@@ -7,7 +7,7 @@
                 <router-link v-if="role==='admin'" to="/users">Пользователи</router-link>
                 <router-link v-if="role==='admin'" to="/issues">Все заявки</router-link>
                 <router-link v-if="role==='admin'" to="/knowledge">База знаний</router-link>
-                <router-link v-if="role==='admin'" to="/stat">Статистика</router-link>
+                <router-link v-if="role==='admin'" to="/stat">Отчеты</router-link>
             </div>
             <div class="user-item">
                 <p v-for="user in users" v-if="user.id === userid">Вы вошли как: <span>{{user.name}}</span></p>

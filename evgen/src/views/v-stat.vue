@@ -1,6 +1,7 @@
 <template>
     <div class="stat">
-        <h2>Статистика</h2>
+        <h2>Отчеты</h2>
+        <h3>Краткая сводка</h3>
         <table>
             <thead>
                 <tr>
@@ -23,6 +24,29 @@
                 </tr>
             </tbody>
         </table>
+        <h3>Отчет по завершенным заявкам</h3>
+        <table>
+            <thead>
+            <tr>
+                <td>Id</td>
+                <td>Дата</td>
+                <td>Исполнитель</td>
+                <td>Категория</td>
+                <td>Тема</td>
+                <td>Длительность исполнения</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-if="issue.id_status === '5'" v-for="issue in issues">
+                <td class="tr">{{issue.id}}</td>
+                <td class="tr">{{issue.create_date}}</td>
+                <td class="tr" v-for="user in users" v-if="issue.is_admin === user.id">{{user.name}} {{user.last_name}}</td>
+                <td class="tr" v-for="category in categories" v-if="issue.id_category === category.id_category">{{category.name_category}}</td>
+                <td class="tr">{{issue.title}}</td>
+                <td v-if="issue.time_diff !== null" class="tr">{{issue.time_diff}}</td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </template>
 
@@ -33,27 +57,34 @@
     export default {
         name: 'v-stat',
         components: {
-            issues: [],
-            groups: 0,
-            categories: 0,
-            issueStatus: [],
-            users: 0,
 
-            countDone: 0,
-            countWork: 0,
-            countCategories: 0,
-            countUsers: 0,
-            countIssues: 0,
-            countGroups: 0
+
         },
         data(){
             return{
+                issues: [],
+                groups: 0,
+                jobs: [],
+                categories: 0,
+                issueStatus: [],
+                users: 0,
+                test: [],
+                usersTest: [],
+                issueStatuses: [],
 
+
+                countDone: 0,
+                countWork: 0,
+                countCategories: 0,
+                countUsers: 0,
+                countIssues: 0,
+                countGroups: 0,
             }
         },
         created() {
             this.$http.get('http://evgen-api.loc/api/get:all/from:issues').then(function(data){
                 this.issues = JSON.parse(JSON.stringify(data.body));
+
                 let issuess = this.issues
                 this.countWork = 0
                 this.countDone = 0
@@ -82,6 +113,9 @@
                     localStorage.setItem('countGroups', this.countGroups)
                 }
             })
+            this.$http.get('http://evgen-api.loc/api/get:all/from:issue').then(function(data){
+                this.jobs = JSON.parse(JSON.stringify(data.body));
+            })
             this.$http.get('http://evgen-api.loc/api/get:all/from:category').then(function(data){
                 this.categories = JSON.parse(JSON.stringify(data.body));
                 let newCategories = this.categories
@@ -90,7 +124,6 @@
                     this.countCategories++
                     localStorage.setItem('countCategories', this.countCategories)
                 }
-
             })
             this.$http.get('http://evgen-api.loc/api/get:all/from:issue_status').then(function(data){
                 this.issueStatus = JSON.parse(JSON.stringify(data.body));
