@@ -257,6 +257,7 @@
         created() {
             this.$http.get('http://evgen-api.loc/api/get:all/from:issues').then(function(data){
                 this.issue = JSON.parse(JSON.stringify(data.body));
+                console.log(this.issue)
                 this.userId = localStorage.userid
             });
             this.$http.get('http://evgen-api.loc/api/get:all/from:users').then(function(data){
@@ -415,6 +416,9 @@
                 if (Month.length===1){
                     Month = '0'+Month
                 }
+                if (Minutes.length===1){
+                    Minutes = '0'+Minutes
+                }
                 if (Day.length===1){
                     Day = '0'+Day
                 }
@@ -473,11 +477,11 @@
                     e.preventDefault();
                     let formData = new FormData(form)
 
-                    formData.append('id', this.maxId)
-                    if (btn.id === 'pause'){
-                        formData.append('id_status', '4')
-                    }
-                    if (btn.id === 'play'){
+                        formData.append('id', this.maxId)
+                        if (btn.id === 'pause'){
+                            formData.append('id_status', '4')
+                        }
+                        if (btn.id === 'play'){
                         formData.append('id_status', '3')
                     }
                     if (btn.id === 'done'){
@@ -496,60 +500,77 @@
                                 DateDone = issues[k].create_date
 
                                 MonthDone = DateDone.slice(5, 7)
+                                console.log('Месяц: '+MonthDone)
                                 DayDone = DateDone.slice(8, 10)
+                                console.log('Дни: '+DayDone)
                                 HourDone = DateDone.slice(11, 13)
+                                console.log('Часы: '+HourDone)
                                 MinutesDone = DateDone.slice(14, 16)
+                                console.log('Минуты: '+MinutesDone)
                                 SecondDate = DateDone.slice(17, 19)
+                                console.log('Секунды: '+SecondDate)
                                 if (MonthDone.length===1){
                                     MonthDone = '0'+MonthDone
+                                    console.log(MonthDone)
                                 }
                                 if (Day.length===1){
                                     DayDone = '0'+DayDone
+                                    console.log(DayDone)
                                 }
                                 if (HourDone.length===1){
                                     HourDone = '0'+HourDone
+                                    console.log(HourDone)
                                 }
                                 if (MinutesDone.length===1){
                                     MinutesDone = '0'+MinutesDone
+                                    console.log(MinutesDone)
                                 }
                                 if (SecondDate.length===1){
                                     SecondDate = '0'+SecondDate
+
                                 }
                             }
                         }
-                        let timeDiff, dayDiff, hourDiff, minutesDiff
+                        let timeDiff, dayDiff, hourDiff, minutesDiff, secondsDiff
 
                         dayDiff = parseInt(DayDone, 10) - Day
-                        console.log(parseInt(DayDone, 10) - Day)
+                        console.log(Day)
                         hourDiff = parseInt(HourDone, 10) - Hours
-                        console.log(parseInt(HourDone, 10) - Hours)
+                        console.log(Hours)
                         minutesDiff = parseInt(MinutesDone, 10) - Minutes
-                        console.log(parseInt(MinutesDone, 10) - Minutes)
+                        console.log(Minutes)
+                        minutesDiff = parseInt(MinutesDone, 10) - Minutes
+                        console.log(Minutes)
 
 
                         if(dayDiff < 0){
                             dayDiff = -dayDiff
-                            console.log(dayDiff)
+                            console.log('Дни: ' + dayDiff)
                         }
                         if (dayDiff===0){
                             dayDiff = 0
-                            console.log(dayDiff)
+                            console.log('Дни: ' + dayDiff)
                         }
                         if (hourDiff < 0){
                             hourDiff = -hourDiff
-                            console.log(hourDiff)
+                            console.log('Часы: ' + hourDiff)
                         }
                         if (minutesDiff < 0){
                             minutesDiff = -minutesDiff
-                            console.log(minutesDiff)
+                            console.log('Минуты: '+minutesDiff)
                         }
 
 
                         if (dayDiff === 0){
                             timeDiff = 'Часов: ' + hourDiff + ' Минут: ' + minutesDiff
+                            console.log('Разница времени: ' + timeDiff)
                         }
-                        if (dayDiff>1){
-                            timeDiff = 'Дней: ' + dayDiff + 'Часов: ' + hourDiff + ' Минут: ' + minutesDiff
+                        if (hourDiff>24){
+                            let delta, newHourDiff
+                            delta = hourDiff % 24
+                            newHourDiff = hourDiff / 24
+                            timeDiff = 'Дней: ' + parseInt(newHourDiff, 10) + ' Часов: '+ delta.slice(0, 2) + ' Минут: ' + minutesDiff
+                            console.log('Разница времени: ' + timeDiff)
                         }
 
                         Month+=''
@@ -583,7 +604,7 @@
                         body: formData
                     });
                     alert('Данные обновлены')
-                    window.location.pathname = '/lk'
+                    // window.location.pathname = '/lk'
                 };
             },
             getChat(){
